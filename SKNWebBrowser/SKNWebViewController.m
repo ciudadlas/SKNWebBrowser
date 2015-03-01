@@ -125,9 +125,13 @@ static void *WebContext = &WebContext;
 
 - (void)setupBottomBar {
     self.backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"backIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(backButtonPressed:)];
+    
+    UIBarButtonItem *separator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    separator.width = 25.f;
+    
     self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"forwardIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardButtonPressed:)];
     
-    self.toolbarItems = @[self.backButton, self.forwardButton];
+    self.toolbarItems = @[self.backButton, separator, self.forwardButton];
 }
 
 - (void)setupProgressView {
@@ -225,7 +229,7 @@ static void *WebContext = &WebContext;
 
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
-    // This is needed to get links with target="_blank" attribute to open on the same page.
+    // This is needed to get links with target="_blank" attribute to open on the same page
     if (!navigationAction.targetFrame.isMainFrame) {
         [webView loadRequest:navigationAction.request];
     }

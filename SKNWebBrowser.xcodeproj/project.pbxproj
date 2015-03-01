@@ -81,9 +81,10 @@
 		752AEBE91AA27B42002A58C2 /* SKNWebBrowser */ = {
 			isa = PBXGroup;
 			children = (
-				752AEC101AA27B7B002A58C2 /* Web View */,
 				752AEBEE1AA27B42002A58C2 /* AppDelegate.h */,
 				752AEBEF1AA27B42002A58C2 /* AppDelegate.m */,
+				752AEC141AA27CF4002A58C2 /* SKNWebViewController.h */,
+				752AEC151AA27CF4002A58C2 /* SKNWebViewController.m */,
 				752AEBF41AA27B42002A58C2 /* Main.storyboard */,
 				752AEBF71AA27B42002A58C2 /* Images.xcassets */,
 				752AEBF91AA27B42002A58C2 /* LaunchScreen.xib */,
@@ -116,15 +117,6 @@
 				752AEC051AA27B42002A58C2 /* Info.plist */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		752AEC101AA27B7B002A58C2 /* Web View */ = {
-			isa = PBXGroup;
-			children = (
-				752AEC141AA27CF4002A58C2 /* SKNWebViewController.h */,
-				752AEC151AA27CF4002A58C2 /* SKNWebViewController.m */,
-			);
-			name = "Web View";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
