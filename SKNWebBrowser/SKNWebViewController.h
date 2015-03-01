@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
-@interface SKNWebViewController : UIViewController <UISearchBarDelegate>
+@interface SKNWebViewController : UIViewController <UISearchBarDelegate, WKNavigationDelegate>
 
 @end

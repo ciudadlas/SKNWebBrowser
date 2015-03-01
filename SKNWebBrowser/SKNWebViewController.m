@@ -7,11 +7,13 @@
 //
 
 #import "SKNWebViewController.h"
-#import <WebKit/WebKit.h>
 
 @interface SKNWebViewController ()
 
 @property (nonatomic, strong) WKWebView *webView;
+@property (nonatomic, strong) UIBarButtonItem *forwardButton;
+@property (nonatomic, strong) UIBarButtonItem *backButton;
+@property (nonatomic, strong) UISearchBar *urlBar;
 
 @end
 
@@ -35,38 +37,68 @@
     [self setupWebView];
     [self setupBottomBar];
     
+    [self updateBarButtonItemsState];
 }
 
 - (void)setupWebView {
     WKWebViewConfiguration *webViewConfiguration = [[WKWebViewConfiguration alloc] init];
     self.webView = [[WKWebView alloc] initWithFrame:self.view.frame configuration:webViewConfiguration];
+    self.webView.navigationDelegate = self;
     [self.view addSubview:self.webView];
+    
+    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://tresnotas.github.io/"]]];
 }
 
 - (void)setupNavigationBar {
     CGRect urlBarFrame = CGRectMake(0.0, 0.0, self.navigationItem.titleView.frame.size.width, self.navigationItem.titleView.frame.size.height);
-    UISearchBar *urlBar = [[UISearchBar alloc] initWithFrame:urlBarFrame];
-    urlBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    urlBar.returnKeyType = UIReturnKeyGo;
-    urlBar.keyboardType = UIKeyboardTypeURL;
-    urlBar.delegate = self;
-    urlBar.placeholder = @"Enter website address";
-    
-    self.navigationItem.titleView = urlBar;
+    self.urlBar = [[UISearchBar alloc] initWithFrame:urlBarFrame];
+    self.urlBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.urlBar.returnKeyType = UIReturnKeyGo;
+    self.urlBar.keyboardType = UIKeyboardTypeURL;
+    self.urlBar.delegate = self;
+    self.urlBar.placeholder = @"Enter website address";
+    self.urlBar.searchBarStyle = UISearchBarStyleMinimal;
+    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setLeftViewMode:UITextFieldViewModeNever];
+//    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTextAlignment:NSTextAlignmentNatural];
+
+    self.navigationItem.titleView = self.urlBar;
+    self.navigationController.navigationBar.backgroundColor = [UIColor grayColor];
 }
 
 - (void)setupBottomBar {
+    self.backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"backIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(backButtonPressed:)];
+    self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"forwardIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardButtonPressed:)];
     
+    self.toolbarItems = @[self.backButton, self.forwardButton];
+}
+
+#pragma mark - View Update Helper Methods
+
+- (void)updateBarButtonItemsState {
+    self.forwardButton.enabled = self.webView.canGoForward;
+    self.backButton.enabled = self.webView.canGoBack;
+}
+
+- (void)updateSearchBarUrl {
+
+    NSString *URLString = [self.webView.URL host];
+    
+    URLString = [URLString stringByReplacingOccurrencesOfString:@"https://" withString:@""];
+    URLString = [URLString stringByReplacingOccurrencesOfString:@"http://" withString:@""];    
+    
+    self.urlBar.text = URLString;
 }
 
 #pragma mark - UISearchBarDelegate Methods
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
     [searchBar setShowsCancelButton:YES animated:YES];
+//    searchBar.searchTextPositionAdjustment = UIOffsetMake(0, 0);
 }
 
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
     [searchBar setShowsCancelButton:NO animated:YES];
+//    searchBar.searchTextPositionAdjustment = UIOffsetMake(30, 0);
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
@@ -90,16 +122,36 @@
     [self.webView loadRequest:newRequest];
 }
 
+#pragma mark - Bottom Bar Action Methods
 
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)backButtonPressed:(id)sender {
+    [self.webView goBack];
 }
-*/
+
+- (void)forwardButtonPressed:(id)sender {
+    [self.webView goForward];
+}
+
+#pragma mark - WKNavigationDelegate Methods
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    [self updateBarButtonItemsState];
+    [self updateSearchBarUrl];
+}
+
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [self updateBarButtonItemsState];
+    [self updateSearchBarUrl];
+}
+
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    [self updateBarButtonItemsState];
+    [self updateSearchBarUrl];
+}
+
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [self updateBarButtonItemsState];
+    [self updateSearchBarUrl];
+}
 
 @end
