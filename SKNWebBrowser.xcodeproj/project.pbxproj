@@ -14,6 +14,7 @@
 		752AEBF81AA27B42002A58C2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 752AEBF71AA27B42002A58C2 /* Images.xcassets */; };
 		752AEBFB1AA27B42002A58C2 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 752AEBF91AA27B42002A58C2 /* LaunchScreen.xib */; };
 		752AEC071AA27B42002A58C2 /* SKNWebBrowserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 752AEC061AA27B42002A58C2 /* SKNWebBrowserTests.m */; };
+		752AEC161AA27CF4002A58C2 /* SKNWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 752AEC151AA27CF4002A58C2 /* SKNWebViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,8 @@
 		752AEC001AA27B42002A58C2 /* SKNWebBrowserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SKNWebBrowserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		752AEC051AA27B42002A58C2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		752AEC061AA27B42002A58C2 /* SKNWebBrowserTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SKNWebBrowserTests.m; sourceTree = "<group>"; };
+		752AEC141AA27CF4002A58C2 /* SKNWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKNWebViewController.h; sourceTree = "<group>"; };
+		752AEC151AA27CF4002A58C2 /* SKNWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKNWebViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +84,7 @@
 		752AEBE91AA27B42002A58C2 /* SKNWebBrowser */ = {
 			isa = PBXGroup;
 			children = (
+				752AEC101AA27B7B002A58C2 /* Web View */,
 				752AEBEE1AA27B42002A58C2 /* AppDelegate.h */,
 				752AEBEF1AA27B42002A58C2 /* AppDelegate.m */,
 				752AEBF11AA27B42002A58C2 /* ViewController.h */,
@@ -117,6 +121,15 @@
 				752AEC051AA27B42002A58C2 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		752AEC101AA27B7B002A58C2 /* Web View */ = {
+			isa = PBXGroup;
+			children = (
+				752AEC141AA27CF4002A58C2 /* SKNWebViewController.h */,
+				752AEC151AA27CF4002A58C2 /* SKNWebViewController.m */,
+			);
+			name = "Web View";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -163,6 +176,7 @@
 		752AEBDF1AA27B42002A58C2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = SKN;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Serdar Karatekin";
 				TargetAttributes = {
@@ -221,6 +235,7 @@
 			files = (
 				752AEBF31AA27B42002A58C2 /* ViewController.m in Sources */,
 				752AEBF01AA27B42002A58C2 /* AppDelegate.m in Sources */,
+				752AEC161AA27CF4002A58C2 /* SKNWebViewController.m in Sources */,
 				752AEBED1AA27B42002A58C2 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
