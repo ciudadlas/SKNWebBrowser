@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
 
-@interface SKNWebViewController : UIViewController <UISearchBarDelegate, WKNavigationDelegate>
+@interface SKNWebViewController : UIViewController <UISearchBarDelegate, WKNavigationDelegate, WKUIDelegate>
 
 @end

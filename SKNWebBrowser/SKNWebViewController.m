@@ -8,12 +8,15 @@
 
 #import "SKNWebViewController.h"
 
+static void *WebContext = &WebContext;
+
 @interface SKNWebViewController ()
 
 @property (nonatomic, strong) WKWebView *webView;
 @property (nonatomic, strong) UIBarButtonItem *forwardButton;
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UISearchBar *urlBar;
+@property (nonatomic, strong) UIProgressView *progressView;
 
 @end
 
@@ -26,8 +29,57 @@
     [self setupView];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self registerNotifications];
+    [self.navigationController.navigationBar addSubview:self.progressView];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+   
+    [self deregisterNotifications];
+    
+    // Remove progress view because the navigation bar is shared across view controllers
+    [self.progressView removeFromSuperview];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+}
+
+#pragma mark - Notifications
+
+- (void)registerNotifications {
+    [self.webView addObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress)) options:0 context:WebContext];
+}
+
+- (void)deregisterNotifications {
+    [self removeObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress)) context:WebContext];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:NSStringFromSelector(@selector(estimatedProgress))] && object == self.webView) {
+        
+        // Animate progress view if there is more progress made
+        [self.progressView setAlpha:1.0f];
+        BOOL animated = self.webView.estimatedProgress > self.progressView.progress;
+        [self.progressView setProgress:self.webView.estimatedProgress animated:animated];
+        
+        // Once web page has fully loaded, fade out the progress view
+        if(self.webView.estimatedProgress >= 1.0f) {
+            [UIView animateWithDuration:0.25f delay:0.25f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                [self.progressView setAlpha:0.0f];
+            } completion:^(BOOL finished) {
+                // Set progress of the view back to 0
+                [self.progressView setProgress:0.0f animated:NO];
+            }];
+        }
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
 }
 
 #pragma mark - View Setup Helpers
@@ -36,6 +88,7 @@
     [self setupNavigationBar];
     [self setupWebView];
     [self setupBottomBar];
+    [self setupProgressView];
     [self updateBarButtonItemsState];
 }
 
@@ -43,6 +96,7 @@
     WKWebViewConfiguration *webViewConfiguration = [[WKWebViewConfiguration alloc] init];
     self.webView = [[WKWebView alloc] initWithFrame:self.view.frame configuration:webViewConfiguration];
     self.webView.navigationDelegate = self;
+    self.webView.UIDelegate = self;
     self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.webView.multipleTouchEnabled = YES;
     self.webView.autoresizesSubviews = YES;
@@ -63,7 +117,7 @@
     self.urlBar.placeholder = @"Enter a website address";
     self.urlBar.searchBarStyle = UISearchBarStyleMinimal;
     [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setLeftViewMode:UITextFieldViewModeNever];
-//    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTextAlignment:NSTextAlignmentNatural];
+//    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTextAlignment:NSTextAlignmentCenter];
 
     self.navigationItem.titleView = self.urlBar;
     self.navigationController.navigationBar.backgroundColor = [UIColor grayColor];
@@ -74,6 +128,15 @@
     self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"forwardIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardButtonPressed:)];
     
     self.toolbarItems = @[self.backButton, self.forwardButton];
+}
+
+- (void)setupProgressView {
+    self.progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    [self.progressView setTrackTintColor:[UIColor clearColor]];
+    CGRect progressViewFrame = CGRectMake(0, self.navigationController.navigationBar.frame.size.height - self.progressView.frame.size.height,
+                                          self.view.frame.size.width, self.progressView.frame.size.height);
+    [self.progressView setFrame:progressViewFrame];
+    [self.progressView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
 }
 
 #pragma mark - View Update Helpers
@@ -110,7 +173,7 @@
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-    // Prepend http:// to user input if it already doesn't have it, because without the http:// the webview doesn't  the request.
+    // Prepend http:// to user input if it already doesn't have it, because without the http:// the webview doesn't load the request.
     NSString *userInput = searchBar.text;
     if (![userInput hasPrefix:@"http://"]) {
         userInput = [NSString stringWithFormat:@"http://%@", userInput];
@@ -124,7 +187,7 @@
     [self.webView loadRequest:newRequest];
 }
 
-#pragma mark - Bottom Toolbar Event Handling
+#pragma mark - Bottom Toolbar Action Handling
 
 - (void)backButtonPressed:(id)sender {
     [self.webView goBack];
@@ -139,6 +202,8 @@
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self updateBarButtonItemsState];
     [self updateSearchBarUrl];
+    
+    // TODO: Here if progress bar hasnt been set back to 0, finish it.
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
@@ -154,6 +219,18 @@
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [self updateBarButtonItemsState];
     [self updateSearchBarUrl];
+}
+
+#pragma mark - WKUIDelegate
+
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
+{
+    // This is needed to get links with target="_blank" attribute to open on the same page.
+    if (!navigationAction.targetFrame.isMainFrame) {
+        [webView loadRequest:navigationAction.request];
+    }
+    
+    return nil;
 }
 
 #pragma mark - Interface Orientation
