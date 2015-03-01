@@ -203,7 +203,7 @@ static void *WebContext = &WebContext;
     [self updateBarButtonItemsState];
     [self updateSearchBarUrl];
     
-    // TODO: Here if progress bar hasnt been set back to 0, finish it.
+    // TODO: Here if progress bar hasnt been set back to 0, set it back.
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
