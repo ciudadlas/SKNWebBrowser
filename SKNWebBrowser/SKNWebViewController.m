@@ -30,7 +30,7 @@
     [super didReceiveMemoryWarning];
 }
 
-#pragma mark - View Setup Helper Methods
+#pragma mark - View Setup Helpers
 
 - (void)setupView {
     [self setupNavigationBar];
@@ -44,6 +44,11 @@
     WKWebViewConfiguration *webViewConfiguration = [[WKWebViewConfiguration alloc] init];
     self.webView = [[WKWebView alloc] initWithFrame:self.view.frame configuration:webViewConfiguration];
     self.webView.navigationDelegate = self;
+    self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.webView.multipleTouchEnabled = YES;
+    self.webView.autoresizesSubviews = YES;
+    self.webView.scrollView.alwaysBounceVertical = YES;
+
     [self.view addSubview:self.webView];
     
     [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://tresnotas.github.io/"]]];
@@ -72,7 +77,7 @@
     self.toolbarItems = @[self.backButton, self.forwardButton];
 }
 
-#pragma mark - View Update Helper Methods
+#pragma mark - View Update Helpers
 
 - (void)updateBarButtonItemsState {
     self.forwardButton.enabled = self.webView.canGoForward;
@@ -84,21 +89,20 @@
     NSString *URLString = [self.webView.URL host];
     
     URLString = [URLString stringByReplacingOccurrencesOfString:@"https://" withString:@""];
-    URLString = [URLString stringByReplacingOccurrencesOfString:@"http://" withString:@""];    
+    URLString = [URLString stringByReplacingOccurrencesOfString:@"http://" withString:@""];
     
     self.urlBar.text = URLString;
 }
 
-#pragma mark - UISearchBarDelegate Methods
+#pragma mark - UISearchBarDelegate
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
     [searchBar setShowsCancelButton:YES animated:YES];
-//    searchBar.searchTextPositionAdjustment = UIOffsetMake(0, 0);
 }
 
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
     [searchBar setShowsCancelButton:NO animated:YES];
-//    searchBar.searchTextPositionAdjustment = UIOffsetMake(30, 0);
+    [self updateSearchBarUrl];
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
@@ -107,22 +111,21 @@
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-    // De-activate search bar
-    [searchBar setShowsCancelButton:NO animated:YES];
-    [searchBar resignFirstResponder];
-    
-    // Prepend http:// to user input if it already doesn't have it, because without the http:// the webview doesn't load the request.
+    // Prepend http:// to user input if it already doesn't have it, because without the http:// the webview doesn't  the request.
     NSString *userInput = searchBar.text;
     if (![userInput hasPrefix:@"http://"]) {
         userInput = [NSString stringWithFormat:@"http://%@", userInput];
     }
+    
+    // De-activate search bar
+    [searchBar resignFirstResponder];
     
     // Load request
     NSURLRequest *newRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:userInput]];
     [self.webView loadRequest:newRequest];
 }
 
-#pragma mark - Bottom Bar Action Methods
+#pragma mark - Bottom Toolbar Event Handling
 
 - (void)backButtonPressed:(id)sender {
     [self.webView goBack];
@@ -132,7 +135,7 @@
     [self.webView goForward];
 }
 
-#pragma mark - WKNavigationDelegate Methods
+#pragma mark - WKNavigationDelegate
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self updateBarButtonItemsState];
@@ -152,6 +155,16 @@
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [self updateBarButtonItemsState];
     [self updateSearchBarUrl];
+}
+
+#pragma mark - Interface Orientation
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
+}
+
+- (BOOL)shouldAutorotate {
+    return YES;
 }
 
 @end
