@@ -41,7 +41,6 @@
     WKWebViewConfiguration *webViewConfiguration = [[WKWebViewConfiguration alloc] init];
     self.webView = [[WKWebView alloc] initWithFrame:self.view.frame configuration:webViewConfiguration];
     [self.view addSubview:self.webView];
-    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.google.com"]]];
 }
 
 - (void)setupNavigationBar {
@@ -52,7 +51,6 @@
     urlBar.keyboardType = UIKeyboardTypeURL;
     urlBar.delegate = self;
     urlBar.placeholder = @"Enter website address";
-    urlBar.contentMode = UIViewContentModeCenter;
     
     self.navigationItem.titleView = urlBar;
 }
@@ -81,7 +79,6 @@
     [searchBar setShowsCancelButton:NO animated:YES];
     [searchBar resignFirstResponder];
     
-
     // Prepend http:// to user input if it already doesn't have it, because without the http:// the webview doesn't load the request.
     NSString *userInput = searchBar.text;
     if (![userInput hasPrefix:@"http://"]) {
