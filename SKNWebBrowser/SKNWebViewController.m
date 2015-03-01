@@ -61,7 +61,7 @@
     self.urlBar.returnKeyType = UIReturnKeyGo;
     self.urlBar.keyboardType = UIKeyboardTypeURL;
     self.urlBar.delegate = self;
-    self.urlBar.placeholder = @"Enter website address";
+    self.urlBar.placeholder = @"Enter a website address";
     self.urlBar.searchBarStyle = UISearchBarStyleMinimal;
     [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setLeftViewMode:UITextFieldViewModeNever];
 //    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTextAlignment:NSTextAlignmentNatural];
