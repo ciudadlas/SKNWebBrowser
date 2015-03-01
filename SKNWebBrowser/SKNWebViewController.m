@@ -27,26 +27,31 @@ static void *WebContext = &WebContext;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupView];
+    [self registerNotifications];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self registerNotifications];
     [self.navigationController.navigationBar addSubview:self.progressView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
    
-    [self deregisterNotifications];
-    
     // Remove progress view because the navigation bar is shared across view controllers
     [self.progressView removeFromSuperview];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+}
+
+- (void)dealloc {
+    [self deregisterNotifications];
+    [self.webView setNavigationDelegate:nil];
+    [self.webView setUIDelegate:nil];
+    [self.urlBar setDelegate:nil];
 }
 
 #pragma mark - Notifications
@@ -117,7 +122,6 @@ static void *WebContext = &WebContext;
     self.urlBar.placeholder = @"Enter a website address";
     self.urlBar.searchBarStyle = UISearchBarStyleMinimal;
     [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setLeftViewMode:UITextFieldViewModeNever];
-//    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTextAlignment:NSTextAlignmentCenter];
 
     self.navigationItem.titleView = self.urlBar;
     self.navigationController.navigationBar.backgroundColor = [UIColor grayColor];
