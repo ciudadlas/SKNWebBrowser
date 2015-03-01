@@ -36,7 +36,6 @@
     [self setupNavigationBar];
     [self setupWebView];
     [self setupBottomBar];
-    
     [self updateBarButtonItemsState];
 }
 
