@@ -61,7 +61,7 @@ static void *WebContext = &WebContext;
 }
 
 - (void)deregisterNotifications {
-    [self removeObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress)) context:WebContext];
+    [self.webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress)) context:WebContext];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
